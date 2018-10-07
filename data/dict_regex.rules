@@ -1,0 +1,100 @@
+# -*-Conf-*-
+#
+# dict_regex.rules - normalization of astronomical identifiers
+#
+# Usual regexp rules from PCRE (in partial matching mode) are accepted.
+# The rule is separated from the recipe by whitespace. You have to
+#  indicate whitespaces in the rule as \s. Possible ones - as \s?. 
+# 
+
+# some common terms badly handled by default dictionaries
+catalogues? catalog
+nuclei nucleus
+zel\sdovich zeldovich
+
+# abbreviations
+uv ultraviolet
+ir infrared
+cm centimeter
+mm millimeter
+
+#object type abbreviations
+bhs? black hole
+wds? white dwarf
+agns? active galactic nucleus
+lbvs? luminous blue variable
+ulxs? ultraluminous xray source
+cdm cold dark matter
+lsb low surface brightness
+sze? sunyaev zeldovich effect
+
+# multi-word entities worth converting to single terms
+x(\s|-)?rays? xray
+gamma(\s|-)?rays? gammaray
+cosmic(\s|-)?rays? cosmicray
+sub(\s|-)?mm submillimeter
+mu\s?m micron
+infra(\s|-)?red infrared
+
+red\s?shift(\w)+ redshift
+k(\s|-)?correct(\w)+ kcorrection
+
+ultra\sluminous ultraluminous
+
+# Messier objects
+(M|Messier)(\s|-)?((\d){1,3}) M$3
+
+# catalogs
+(NGC|Abell|MKN|IC|H[DHR]|UGC|SAO|MWC)(\s|-)?((\d){1,6}[ABC]?) $1$3
+(PSR|PKS)(\s|-)?([JB]?)(\d\d\d\d)\s?([+-]\d\d)\d? $1$4$5
+
+# Surveys and Instruments
+OGLE(\s|-)?((I){1,3}) ogle
+HST hubble space telescope
+
+WFPC\d? wfpc
+hete2? hete
+
+wmap wilkinson microwave anisotropy probe
+
+# Famous objects
+T\s?Tau(ri)? ttauri
+SS(\s|-)?433 ss433
+1987\s?A 1987a
+BL\s?Lac(ertae?)? bllac
+
+# Supernovae
+supernova(.)* sn
+SNe?\s?(II?[abc]) sn $1
+SN(\d\d\d\d)(([a-z]){0,2}) sn $1$2
+Ib/c ib ic
+
+# Spectral lines
+H(\s|-)?(alpha|beta|gamma) h$2
+(Fe|Mg|Si|He|Ni)(\s|-)?((\d)|([IXV])+) $1$3
+
+# GRBs
+grbs? gammaray burst
+GRB\s?(\d\d\d\d\d\d)([abcd]?) gammaray burst $1$2
+
+# Metallicities - very generic rule, must be as late as possible
+#(\w\w?)/(\w\w?) $1/$2
+
+# misc
+log\s(n|s) log$1
+top\s(10|50|100) top$1
+
+# compound words
+(micro|macro|meta|post)((\w)+) $1 $2
+
+# Fallback - some generic normalizations
+### coordinates with J or B prefix. strip prefix, accept RA in [0-29], and lower the precision
+([JB])([0-2]\d\d\d)(\d){0,2}\s(\+\d\d)(\d){0,2} $2$4
+([JB])([0-2]\d\d\d)(\d){0,2}\s\-?(\d\d)(\d){0,2} $2-$4
+
+### year + 0 to 2 letters attached. years are in [1000-2999] range
+([12]\d\d\d)(([a-z]){0,2}) $1$2
+
+# X-ray sources
+X\s?((\d){1,3}) x$1
+ 

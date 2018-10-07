@@ -1,0 +1,93 @@
+Regular expressions dictionary for PostgreSQL
+=============================================
+
+This code is a dictionary for PostgreSQL full-text search, which combines the
+generic synonym and thesaurus ones with the power of regular expressions.
+
+* Configuration
+
+The dictionary accepts one obligatory parameter - RULES, which has to be set to
+the file describing parsing rules and output recipes.
+
+Its syntax is very simple.  Each non-empty line is either a comment
+(when started with '#' symbol), or a conversion rule, and in the latter case
+has to contain whitespace-separated pattern and output recipe.
+
+Currently, pattern has to match the _integer_ (one, two or more) number of input
+tokens; they will be replaced with a single one. All whitespaces between input
+words are treated as single one.
+
+If the output recipe is empty, the match is considered to be a stop-word, and
+is not processed by the dictionaries next in line.
+
+The pattern is explicitly enclosed by the dictionary inside "^...$" construct, so
+you need not include these.
+
+If several rules are matching the input stream, the longest one will be
+accepted, and if there are several - the one which is earlier in the rules.
+
+The pattern syntax is basically the one of PCRE, and is compatible to Perl. The
+one exception is the following (related to the PCRE working in partial matching
+mode): repeated single characters such as "a{2,4}" and repeated single
+metasequences such as "\d+" are not permitted if the maximum number of
+occurrences is greater than one. Optional items such as "\d?" (where the maximum
+is one) are permitted. Quantifiers with any values are permitted after
+parentheses, so the invalid examples above can be coded as "(a){2,4}" and "(\d)+",
+correspondingly.
+
+Also, as for now, only 9 matched substrings are supported (**$1** - **$9**). They will
+be translated to lower case along with all the output recipe.  If output recipe
+contains several words, it will be returned as a set of tokens with the same
+position, i.e. they will be treated as the synonyms.
+
+* Usage
+ 
+ 1. Compile and install it. The compilation requires PCRE (http://pcre.org)
+    headers and library in compiler-accessible paths; in a case, tweak the
+    Makefile according to your settings
+
+ 2. Load the dictionary definitions into your database
+    
+    psql qq < dict_regex.sql
+
+ 3. Create the conversion rules, and point the dictionary to the file
+
+    qq# ALTER TEXT SEARCH DICTIONARY regex (RULES = '@your_rules_file@');
+    ALTER TEXT SEARCH DICTIONARY
+
+ 4. Use it as you wish
+
+* Examples
+
+Some basic example rules:
+
+# Synonym expansion - 'catalogue' will be indexed both as is and as 'catalog'
+# on the query side, it means 'catalogue' -> 'catalogue' & 'catalog'
+catalogue catalogue catalog
+
+# Thesaurus - index 'regular expression' as single token
+regular\sexpressions? regex
+
+# Complex behaviour - transpose parts of a 8-digit number, 12345678 -> 56781234
+(\d\d\d\d)(\d\d\d\d) $2$1
+
+* Todo
+
+ - Improve handling of config file - allow whitespaces in patterns and in recipes
+ - Improve recipe parsing - allow more than 9 matches per pattern
+ - Improve performance of pattern matching - do not reparse already processed
+   parts of incoming string
+ - Think about integration with other dictionaries (like thesaurus does) for
+   normalization before pattern matching
+ - Implement complex expansion of 'synonyms' - i.e. rule options to control
+   complex AND and OR behaviour of returned lexemes.
+ - Replace (or optionally replace) PCRE with PostgreSQL built-in regular
+   expressions engine
+
+* Security notice
+
+Be warned that dict_regex is insecure - id does not perform any special checks
+on the location and content of the rule file. So, it may be pointed to any file
+readable by postmaster, and it is possible to user to reconstruct the file
+contents. Do not use it in security-critical environments, or modify the source
+accordingly.

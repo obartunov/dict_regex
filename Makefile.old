@@ -1,0 +1,12 @@
+subdir = contrib/dict_regex
+top_builddir = ../..
+include $(top_builddir)/src/Makefile.global
+
+MODULE_big = dict_regex
+OBJS =  dict_regex.o parser.o utils.o
+DATA_built = dict_regex.sql
+DOCS = README.dict_regex
+SHLIB_LINK = -lpcre
+REGRESS = dict_regex
+
+include $(top_srcdir)/contrib/contrib-global.mk

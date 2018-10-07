@@ -1,0 +1,105 @@
+CREATE EXTENSION dict_regex;
+ALTER TEXT SEARCH DICTIONARY regex (RULES='/home/teodor/Downloads/dict_regex/data/dict_regex.rules');
+--lexize
+SELECT ts_lexize('regex', 'catalogues');
+ ts_lexize 
+-----------
+ {catalog}
+(1 row)
+
+SELECT ts_lexize('regex', 'catalog');
+ ts_lexize 
+-----------
+ 
+(1 row)
+
+SELECT ts_lexize('regex', 'nuclei');
+ ts_lexize 
+-----------
+ {nucleus}
+(1 row)
+
+SELECT ts_lexize('regex', 'uv');
+   ts_lexize   
+---------------
+ {ultraviolet}
+(1 row)
+
+SELECT ts_lexize('regex', 'ir');
+ ts_lexize  
+------------
+ {infrared}
+(1 row)
+
+SELECT ts_lexize('regex', 'ia');
+ ts_lexize 
+-----------
+ 
+(1 row)
+
+SELECT ts_lexize('regex', 'cm');
+  ts_lexize   
+--------------
+ {centimeter}
+(1 row)
+
+SELECT ts_lexize('regex', 'mm');
+  ts_lexize   
+--------------
+ {millimeter}
+(1 row)
+
+SELECT ts_lexize('regex', 'bh');
+  ts_lexize   
+--------------
+ {black,hole}
+(1 row)
+
+SELECT ts_lexize('regex', 'bhs');
+  ts_lexize   
+--------------
+ {black,hole}
+(1 row)
+
+SELECT ts_lexize('regex', 'x-ray');
+ ts_lexize 
+-----------
+ {xray}
+(1 row)
+
+SELECT ts_lexize('regex', 'gamma ray');
+ ts_lexize  
+------------
+ {gammaray}
+(1 row)
+
+SELECT ts_lexize('regex', 'ngc 1234');
+ ts_lexize 
+-----------
+ {ngc1234}
+(1 row)
+
+SELECT ts_lexize('regex', 'sao 12');
+ ts_lexize 
+-----------
+ {sao12}
+(1 row)
+
+SELECT ts_lexize('regex', 'wmap');
+               ts_lexize                
+----------------------------------------
+ {wilkinson,microwave,anisotropy,probe}
+(1 row)
+
+SELECT ts_lexize('regex', 'sne Ia');
+ ts_lexize 
+-----------
+ {sn,ia}
+(1 row)
+
+SELECT ts_lexize('regex', '1997a');
+ ts_lexize 
+-----------
+ {1997a}
+(1 row)
+

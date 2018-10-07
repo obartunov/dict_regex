@@ -1,0 +1,5 @@
+# dict_regex extension
+comment = 'Dictionary with regular expression support'
+default_version = '1.0'
+module_pathname = '$libdir/dict_regex'
+relocatable = true
